@@ -1,0 +1,17 @@
+google:
+  enabled: true
+  client-secret-file: classpath:client_secret.json
+  tokens-directory-path: tokens
+  application-name: Email Fetcher Drive Uploader
+
+mail:
+  label: MyFinance/Screener
+  mappings:
+    "[no-reply@screener.in]": "1XFYgzEe1pYOLPE7OzbNSiVRkZA3ccTE_"
+
+screener:
+  sender: no-reply@screener.in
+  subject-contains: Screener.in Updates
+  timezone: Asia/Kolkata
+  days-back: 1
+
