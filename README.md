@@ -347,6 +347,31 @@ Once mounted:
 
 ---
 
+# GitHub Actions Cron Setup
+
+This module now exposes two HTTP endpoints for external automation:
+
+```text
+GET  /health
+POST /api/cron/fetch-screener
+```
+
+The repository includes a daily GitHub Actions workflow at:
+
+```text
+.github/workflows/daily-cron.yml
+```
+
+To use it, add this repository secret in GitHub:
+
+```text
+RENDER_BASE_URL=https://your-render-service.onrender.com
+```
+
+The workflow pings `/health` first to wake the service, then calls `/api/cron/fetch-screener` to run the Gmail-to-Drive sync.
+
+---
+
 # Security Recommendations
 
 Never commit:

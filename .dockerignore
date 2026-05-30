@@ -1,0 +1,9 @@
+target/
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+tokens/
+src/main/resources/client_secret.json

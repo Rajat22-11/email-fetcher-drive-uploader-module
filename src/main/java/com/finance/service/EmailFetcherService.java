@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,7 +31,9 @@ public class EmailFetcherService {
         String label = mappingConfig.getLabel();
         Map<String, String> mappings = mappingConfig.getMappings();
 
-        log.info("Starting processing for label={} with {} mappings", label, mappings.size());
+        log.info("Email fetch start",
+                kv("label", label),
+                kv("mappingCount", mappings.size()));
 
         for (Map.Entry<String, String> e : mappings.entrySet()) {
             String from = e.getKey();
@@ -38,23 +42,44 @@ public class EmailFetcherService {
             try {
                 List<EmailMessage> messages = gmailClient.fetchMessagesByLabelAndFrom(label, from);
                 if (messages == null || messages.isEmpty()) {
-                    log.info("No messages for {} under label {}", from, label);
+                    log.info("No messages found",
+                            kv("label", label),
+                            kv("sender", from));
                     continue;
                 }
+
+                log.info("Fetched messages",
+                        kv("label", label),
+                        kv("sender", from),
+                        kv("count", messages.size()));
 
                 for (EmailMessage msg : messages) {
                     String filename = msg.getId() + ".eml";
                     try {
                         driveStorage.saveEml(targetPath, filename, msg.getRawEml());
+                        log.info("Uploaded eml",
+                                kv("label", label),
+                                kv("sender", from),
+                                kv("messageId", msg.getId()),
+                                kv("targetFolder", targetPath));
                     } catch (IOException ioe) {
-                        log.error("Failed to save message {} to {}", msg.getId(), targetPath, ioe);
+                        log.error("Upload failed",
+                                kv("label", label),
+                                kv("sender", from),
+                                kv("messageId", msg.getId()),
+                                kv("targetFolder", targetPath),
+                                kv("error", ioe.getMessage()));
                     }
                 }
             } catch (Exception ex) {
-                log.error("Failed to fetch messages for {} under label {}", from, label, ex);
+                log.error("Fetch failed",
+                        kv("label", label),
+                        kv("sender", from),
+                        kv("error", ex.getMessage()));
             }
         }
 
-        log.info("Processing completed for label={}", label);
+        log.info("Email fetch completed",
+                kv("label", label));
     }
 }

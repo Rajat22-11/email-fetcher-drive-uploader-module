@@ -1,3 +1,10 @@
+spring:
+  application:
+    name: Email Fetcher Drive Uploader
+
+server:
+  port: ${PORT:8080}
+
 google:
   enabled: true
   client-secret-file: classpath:client_secret.json
@@ -14,4 +21,8 @@ screener:
   subject-contains: Screener.in Updates
   timezone: Asia/Kolkata
   days-back: 1
+
+fetch:
+  scheduler:
+    enabled: false
 
