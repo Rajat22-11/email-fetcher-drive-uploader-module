@@ -1,5 +1,6 @@
 package com.finance.config;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -36,19 +37,29 @@ public class GoogleServicesConfig {
     private final GoogleOAuthConfig config;
 
     @Bean
-    public com.google.api.client.auth.oauth2.Credential googleCredential() throws Exception {
+    public Credential googleCredential() throws Exception {
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
-        // Resolve path dynamically from your properties (stripping 'classpath:' if needed)
-        String resourcePath = config.getClientSecretFile().replace("classpath:", "");
-        if (!resourcePath.startsWith("/")) {
-            resourcePath = "/" + resourcePath;
+        InputStream in = null;
+        String secretPath = config.getClientSecretFile();
+
+        // 1. Try reading it as an external absolute file system path first (For Render)
+        java.io.File externalFile = new java.io.File(secretPath);
+        if (externalFile.exists()) {
+            in = new java.io.FileInputStream(externalFile);
+        } else {
+            // 2. Fallback: Clean up prefix and read from Classpath (For Local Machine)
+            String resourcePath = secretPath.replace("classpath:", "");
+            if (!resourcePath.startsWith("/")) {
+                resourcePath = "/" + resourcePath;
+            }
+            in = getClass().getResourceAsStream(resourcePath);
         }
 
-        InputStream in = getClass().getResourceAsStream(resourcePath);
         if (in == null) {
-            throw new RuntimeException("OAuth client secret file not found at: " + config.getClientSecretFile());
+            throw new RuntimeException("OAuth client secret file not found at path or classpath: " + secretPath);
         }
+
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
