@@ -75,7 +75,7 @@ public class GoogleServicesConfig {
     }
 
     @Bean
-    public Gmail gmailService(com.google.api.client.auth.oauth2.Credential credential) throws Exception {
+    public Gmail gmailService(Credential credential) throws Exception {
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         return new Gmail.Builder(httpTransport, JSON_FACTORY, credential)
                 .setApplicationName(config.getApplicationName())
@@ -83,7 +83,7 @@ public class GoogleServicesConfig {
     }
 
     @Bean
-    public Drive driveService(com.google.api.client.auth.oauth2.Credential credential) throws Exception {
+    public Drive driveService(Credential credential) throws Exception {
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         return new Drive.Builder(httpTransport, JSON_FACTORY, credential)
                 .setApplicationName(config.getApplicationName())
