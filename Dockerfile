@@ -16,13 +16,14 @@ RUN ./mvnw -q -DskipTests package
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copy the built jar (works for standard Spring Boot layout)
+# Copy the built jar
 COPY --from=build /workspace/target/*.jar app.jar
 
-# Optional: expose default Spring Boot port
+# Expose default Spring Boot port
 EXPOSE 8080
 
-# Optional JVM flags (tweak for memory-limited environments)
-ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+# Default low-memory JVM flags
+ENV JAVA_OPTS="-XX:TieredStopAtLevel=1 -Xmx350m"
 
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
+# Decode the Base64 variable into the local 'tokens/' directory before starting Java
+ENTRYPOINT ["sh", "-c", "mkdir -p /app/tokens && echo \"$STORED_CREDENTIAL_BASE64\" | base64 -d > /app/tokens/StoredCredential && java $JAVA_OPTS -jar /app/app.jar"]
