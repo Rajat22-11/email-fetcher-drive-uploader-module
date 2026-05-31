@@ -33,7 +33,6 @@ public class GoogleServicesConfig {
             "https://www.googleapis.com/auth/drive.file"
     );
 
-    // Injecting your clean config properties class here
     private final GoogleOAuthConfig config;
 
     @Bean
@@ -41,14 +40,15 @@ public class GoogleServicesConfig {
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 
         InputStream in = null;
-        String secretPath = config.getClientSecretFile();
 
-        // 1. Try reading it as an external absolute file system path first (For Render)
-        java.io.File externalFile = new java.io.File(secretPath);
-        if (externalFile.exists()) {
-            in = new java.io.FileInputStream(externalFile);
+        // 1. Direct Check: Look explicitly where Render mounts your Secret File
+        java.io.File renderFile = new java.io.File("/etc/secrets/client_secret.json");
+
+        if (renderFile.exists()) {
+            in = new java.io.FileInputStream(renderFile);
         } else {
-            // 2. Fallback: Clean up prefix and read from Classpath (For Local Machine)
+            // 2. Fallback: Parse via properties config path (For Local Machine)
+            String secretPath = config.getClientSecretFile();
             String resourcePath = secretPath.replace("classpath:", "");
             if (!resourcePath.startsWith("/")) {
                 resourcePath = "/" + resourcePath;
@@ -57,14 +57,17 @@ public class GoogleServicesConfig {
         }
 
         if (in == null) {
-            throw new RuntimeException("OAuth client secret file not found at path or classpath: " + secretPath);
+            throw new RuntimeException("OAuth client secret file could not be resolved externally or on Classpath.");
         }
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
+        // 3. Dynamic token directory placement based on active environment
+        String tokenDirectory = renderFile.exists() ? "/app/tokens" : config.getTokensDirectoryPath();
+
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(config.getTokensDirectoryPath())))
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(tokenDirectory)))
                 .setAccessType("offline")
                 .build();
 
