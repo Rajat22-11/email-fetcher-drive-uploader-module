@@ -2,8 +2,8 @@ name: Daily Health Ping and Screener Fetch
 
 on:
   schedule:
-    # Trigger at exactly 23:45 Asia/Kolkata (18:15 UTC)
-    - cron: '05 07 * * *' #12:35 PM in INDIA
+    # 07:30 AM Asia/Kolkata = 02:00 AM UTC
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
             echo "RENDER_BASE_URL secret is required" >&2
             exit 1
           fi
-  
+          
           echo "Pinging instance to trigger spin up..."
           # A short 10-second max-time flag (-m 10) wakes Render up without stalling the GitHub runner 
           # while the Java container performs its internal startup processing tasks.

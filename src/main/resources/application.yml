@@ -20,7 +20,7 @@ screener:
   sender: no-reply@screener.in
   subject-contains: Screener.in Updates
   timezone: Asia/Kolkata
-  days-back: 3
+  days-back: 1
 
 fetch:
   scheduler:

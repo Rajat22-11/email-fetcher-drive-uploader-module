@@ -13,6 +13,6 @@ public class ScreenerConfig {
     private String sender = "no-reply@screener.in";
     private String subjectContains = "Screener.in Updates";
     private String timezone = "Asia/Kolkata";
-    private int daysBack = 3;
+    private int daysBack = 1;
 }
 
