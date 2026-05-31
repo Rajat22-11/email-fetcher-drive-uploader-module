@@ -1,29 +1,17 @@
 # --- Build stage ---
-FROM eclipse-temurin:21-jdk AS build
-WORKDIR /workspace
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+WORKDIR /app
 
-# Copy Maven wrapper + pom first for dependency caching
-COPY mvnw .
-COPY .mvn/ .mvn/
-COPY pom.xml .
-RUN ./mvnw -q -DskipTests dependency:go-offline
-
-# Copy source and build
-COPY src/ src/
-RUN ./mvnw -q -DskipTests package
+# Just copy everything and build it using global Maven
+COPY . .
+RUN mvn clean package -DskipTests
 
 # --- Runtime stage ---
 FROM eclipse-temurin:21-jre
 WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
-# Copy the built jar
-COPY --from=build /workspace/target/*.jar app.jar
-
-# Expose default Spring Boot port
 EXPOSE 8080
-
-# Default low-memory JVM flags
 ENV JAVA_OPTS="-XX:TieredStopAtLevel=1 -Xmx350m"
 
-# Decode the Base64 variable into the local 'tokens/' directory before starting Java
 ENTRYPOINT ["sh", "-c", "mkdir -p /app/tokens && echo \"$STORED_CREDENTIAL_BASE64\" | base64 -d > /app/tokens/StoredCredential && java $JAVA_OPTS -jar /app/app.jar"]
