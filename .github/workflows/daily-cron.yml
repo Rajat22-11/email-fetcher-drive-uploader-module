@@ -3,7 +3,7 @@ name: Daily Health Ping and Screener Fetch
 on:
   schedule:
     # Trigger at exactly 23:45 Asia/Kolkata (18:15 UTC)
-    - cron: '30 12 * * *'
+    - cron: '05 07 * * *' #12:35 PM in INDIA
   workflow_dispatch:
 
 jobs:
