@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Fetcher & Drive Uploader</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0f172a;
+            --card: #111827;
+            --border: #243244;
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-2: #22c55e;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Inter, Segoe UI, Arial, sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 60%);
+            color: var(--text);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+        .card {
+            width: min(900px, 100%);
+            background: rgba(17, 24, 39, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(10px);
+        }
+        h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3rem); }
+        p { line-height: 1.7; color: var(--muted); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .tile {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            background: rgba(15, 23, 42, 0.7);
+        }
+        .tile h2 {
+            margin: 0 0 10px;
+            font-size: 1.05rem;
+            color: var(--accent);
+        }
+        code, .pill {
+            font-family: Consolas, Monaco, monospace;
+            background: #0b1220;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 4px 10px;
+            color: #dbeafe;
+            display: inline-block;
+        }
+        ul { margin: 10px 0 0 20px; color: var(--muted); }
+        .footer {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+        .status {
+            color: var(--accent-2);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <span class="pill">Spring Boot • Gmail • Google Drive • Render</span>
+        <h1>Email Fetcher &amp; Drive Uploader</h1>
+        <p>
+            This service automatically scans Gmail for configured label/sender combinations,
+            fetches the raw email messages, and uploads them as <code>.eml</code> files into
+            Google Drive folders for archiving and downstream automation.
+        </p>
+
+        <div class="grid">
+            <section class="tile">
+                <h2>Health Check</h2>
+                <p>
+                    The cron job and uptime probes should hit <code>/health</code> by default.
+                </p>
+            </section>
+            <section class="tile">
+                <h2>Deployment Note</h2>
+                <p>
+                    Render should call the service at the root URL, which now serves this landing page.
+                </p>
+            </section>
+            <section class="tile">
+                <h2>Cron Timing</h2>
+                <p>
+                    Schedule the recurring cron job for <span class="status">6:00 AM every day</span>.
+                </p>
+                <p><code>0 6 * * *</code></p>
+            </section>
+            <section class="tile">
+                <h2>What It Does</h2>
+                <ul>
+                    <li>Reads Gmail labels and sender mappings</li>
+                    <li>Downloads the raw email body as <code>.eml</code></li>
+                    <li>Stores files in the configured Google Drive folder</li>
+                </ul>
+            </section>
+        </div>
+
+        <div class="footer">
+            If you see this page on Render, the service is running correctly.
+            For the exact job status, check <code>/health</code> and the Render logs.
+        </div>
+    </main>
+</body>
+</html>
+

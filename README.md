@@ -356,6 +356,16 @@ GET  /health
 POST /api/cron/fetch-screener
 ```
 
+If you want a simple uptime or warm-up check, use `GET /health`. The cron job can safely hit this endpoint by default before any heavier work runs.
+
+Recommended daily schedule:
+
+```text
+0 6 * * *
+```
+
+This runs the job every day at 6:00 AM.
+
 The repository includes a daily GitHub Actions workflow at:
 
 ```text

@@ -1,0 +1,38 @@
+name: Daily Processor Ping and EML Extraction
+
+on:
+  schedule:
+    # 07:30 AM IST = 02:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake up Render Container
+        env:
+          BASE_URL: ${{ secrets.RENDER_BASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE_URL}" ]; then
+            echo "RENDER_BASE_URL secret is required" >&2
+            exit 1
+          fi
+
+          echo "Pinging instance to trigger spin up..."
+          curl -s -m 10 "${BASE_URL%/}/health" || echo "Container wake up signal transmitted successfully."
+
+      - name: Trigger processor module
+        env:
+          BASE_URL: ${{ secrets.RENDER_BASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BASE_URL}" ]; then
+            echo "RENDER_BASE_URL secret is required" >&2
+            exit 1
+          fi
+
+          echo "Triggering yesterday EML processing..."
+          curl -s -m 30 -X POST "${BASE_URL%/}/api/cron/process-yesterday-eml" || echo "Processor trigger submitted successfully."
+
